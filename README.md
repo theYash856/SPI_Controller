@@ -1,4 +1,4 @@
-# Parameterised SPI Controller
+# SPI Controller
 
 ## 1. Overview
 The SPI Controller is a parameterised Verilog implementation of the Serial Peripheral Interface (SPI) protocol. It consists of configurable **Master**, **Slave**, and **Clock Divider** modules, supporting all four SPI modes (0–3) through programmable Clock Polarity (`CPOL`) and Clock Phase (`CPHA`) parameters.
@@ -117,6 +117,8 @@ SPI_Controller/
 
 </div>
 
+---
+
 #### Expanded View
 
 <div align = "center">
@@ -125,6 +127,8 @@ SPI_Controller/
 
 </div>
 
+---
+
 ### 9.2. Integrated SPI Controller Waveform
 
 <div align="center">
@@ -132,6 +136,8 @@ SPI_Controller/
 ![Waveform Full View](waveforms/waveform_summary.gif)
 
 </div>
+
+---
 
 ### 9.3. Verification Summary
 
@@ -162,6 +168,6 @@ The complete verification suite was executed for all four SPI modes by varying t
 
 **Language:** Verilog HDL
 
-**EDA Tools:** Xilinx Vivado (Simulation and RTL analysis). The design is also compatible with online EDA platforms.
+**EDA Tools:** Xilinx Vivado (RTL analysis and simulation). The design is also compatible with online EDA platforms.
 
 **New Concepts Explored:** Synchronous Serial Communication, Parameterised RTL Design, Clock Polarity (CPOL), Clock Phase (CPHA), and RTL Timing Verification.
