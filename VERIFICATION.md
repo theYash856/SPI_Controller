@@ -91,9 +91,55 @@ The following sections summarise the functional test cases executed for each mod
 
 ## 5. Waveform Analysis
 
+### 5.1. SPI Clock Divider Waveform
+
+<div align="center">
+
+![SPI Clock Divider Waveform](waveforms/clk_div_waveform.png)
+
+</div>
+
+Demonstrates SPI clock generation from the system clock, including the corresponding positive and negative edge tick signals used for data synchronization.
+
+---
+
+### 5.2. SPI Master Waveform
+
+<div align="center">
+
+![SPI Master Waveform](waveforms/master_waveform.gif)
+
+</div>
+
+Illustrates the Master's state transitions, Chip-Select control, serial data transmission over **MOSI**, data reception through **MISO**, and transaction completion.
+
+---
+
+### 5.3. SPI Slave Waveform
+
+<div align="center">
+
+![SPI Slave Waveform](waveforms/slave_waveform.gif)
+
+</div>
+
+Illustrates the Slave's response to the Master's transaction, including serial data reception on **MOSI**, transmission on **MISO**, and internal state transitions.
+
+---
+
+### 5.4. Integrated SPI Controller Waveform
+
+<div align="center">
+
+![Integrated SPI Controller Waveform](waveforms/waveform_summary.gif)
+
+</div>
+
+Shows a complete end-to-end SPI transaction, including Clock Divider operation, Master–Slave synchronization, full-duplex data transfer, and successful transaction completion.
+
 ## 6. Verification Results
 
-| Module | Test Cases | Functional Checks | Result |
+| Module | Test Cases | Verification Checks | Result |
 |:--------|:----------:|:-----------------:|:------:|
 | SPI Clock Divider | 5 | 5 | ✅ Pass |
 | SPI Master | 8 | 17 | ✅ Pass |
@@ -110,12 +156,15 @@ The following sections summarise the functional test cases executed for each mod
 One of the most challenging issues occurred in the SPI Master while implementing **CPHA = 0** operation. Although the remaining bits were transmitted correctly, the first bit was never placed on the output before the initial sampling edge, causing every transfer to start with incorrect data.
 
 **Root Cause**
+
 In CPHA = 0, the first data bit must already be present on the serial output before the first sample edge. The transmit shift register was loaded correctly, but the first output bit was not preloaded onto the transmission line.
 
 **Resolution**
+
 The first transmit bit was explicitly preloaded during the `LOAD` state before entering the transfer state. Separate handling was maintained for CPHA = 0 and CPHA = 1 since their first-bit timing requirements differ.
 
 **Key Learning**
+
 Understanding protocol timing is as important as implementing the protocol logic itself. Small differences in edge timing can completely change the behaviour of a communication interface.
 
 
@@ -124,12 +173,15 @@ Understanding protocol timing is as important as implementing the protocol logic
 The most time-consuming debugging effort involved synchronizing the verification environment with the DUT. In many cases, the RTL implementation was functionally correct, but the verification checks were performed before the design outputs had updated.
 
 **Root Cause**
+
 Driver tasks, SPI clock-edge generation, and verification checks were not perfectly aligned with the DUT's sequential logic. Several failures were caused by simulation scheduling rather than incorrect RTL functionality.
 
 **Resolution**
+
 Carefully synchronized stimulus and verification using `@(posedge clk)` where required. Introduced small simulation delays (`#1`) after SPI edge generation before checking outputs, ensuring signals had propagated and settled. Refined the ordering of driver tasks and verification checks until they accurately reflected the expected hardware behavior.
 
 **Key Learning**
+
 RTL verification requires precise synchronization between stimulus, clock events, and signal observation. Correct logic can appear to fail if verification is performed even one simulation step too early.
 
 ### 7.3. CS-Driven Engagement Race Condition
@@ -137,12 +189,15 @@ RTL verification requires precise synchronization between stimulus, clock events
 While integrating the Master and Slave in `SPI_TOP`, `T-04` intermittently failed because `slave_busy` remained high for one extra clock cycle even after the Slave had returned to the `IDLE` state.
 
 **Root Cause**  
+
 The Slave entered the `LOAD` state based on the value of `CS`. Although the next-state logic correctly prevented a transfer when `CS` was released, the output logic in the `LOAD` state still asserted `busy` for one clock cycle. This caused a temporary mismatch between the Slave's state and its output signals.
 
 **Resolution**  
+
 Added the same `CS` condition inside the `LOAD` state's output logic so that both the state transition and output signals are controlled by the same condition.
 
 **Key Learning**  
+
 State transition logic and output logic should use the same control conditions. Otherwise, they can become temporarily out of sync, leading to subtle one-clock-cycle timing issues that are often only revealed during integration testing.
 
 ## 8. Conclusion
