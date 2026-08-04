@@ -4,9 +4,9 @@
 The SPI Controller is a parameterised Verilog implementation of the Serial Peripheral Interface (SPI) protocol. It consists of configurable **Master**, **Slave**, and **Clock Divider** modules, supporting all four SPI modes (0–3) through programmable Clock Polarity (`CPOL`) and Clock Phase (`CPHA`) parameters.
 
 ## 2. Features 
-- Full-duplex synchronous communication.
 - Single Master–Single Slave architecture.
-- Supports all SPI modes (0–3).
+- Full-duplex synchronous communication.
+- Supports all four SPI modes (0–3).
 - Parameterised data width and SPI clock frequency.
 - Self-checking verification with end-to-end loopback testing.
 
@@ -19,11 +19,50 @@ The SPI Controller operates using a single Master and a single Slave communicati
 - **MISO** – Master In, Slave Out data line.
 - **CS** – Active-low Chip Select used to enable the Slave.
 
-// Add working diagram
+<div align = "center">
+
+![Working Diagram](images/diagram.png)
+
+</div>
 
 During a transaction, the Master asserts **CS**, enables the Clock Divider to generate the serial clock, and simultaneously transmits and receives one bit per clock cycle. Since this implementation uses an **8-bit data width**, each transaction requires 8 SPI clock cycles to complete. The sampling and shifting edges are determined by the selected SPI mode (CPOL/CPHA).
 
-## 4. Repository Structure 
+## 4. Repository Structure
+
+```text
+SPI_Controller/
+│
+├── src/
+│   ├── SPI_Clock_Divider.v
+│   ├── SPI_Master.v
+│   ├── SPI_Slave.v
+│   └── SPI_TOP.v
+│
+├── tb/
+│   ├── SPI_Clock_Divider_tb.v
+│   ├── SPI_Master_tb.v
+│   ├── SPI_Slave_tb.v
+│   └── SPI_TOP_tb.v
+│
+├── images/
+│   ├── diagram.png
+│   ├── RTL_schematic.png
+│   ├── RTL_zoomed.png
+│   ├── mode0.png
+│   ├── mode1.png
+│   ├── mode2.png
+│   └── mode3.png
+│ 
+├── waveforms/
+│   ├── clk_div_waveform.png
+│   ├── master_waveform.gif
+│   ├── slave_waveform.gif
+│   └── waveform_summary.gif
+│
+├── README.md
+├── VERIFICATION.md
+└── LICENSE
+```
 
 ## 5. Configuration Parameters
 
@@ -64,16 +103,62 @@ During a transaction, the Master asserts **CS**, enables the Clock Divider to ge
 ## 8. Verification 
 
 > [!NOTE]
-> A detailed verification report covering the verification methodology, test cases, waveform analysis, debugging process, and final results is documented in [VERIFICATION.md]()
+> A detailed verification report covering the verification methodology, test cases, waveform analysis, debugging process, and final results is documented in [VERIFICATION.md](https://github.com/theYash856/Parameterised_SPI_Controller/blob/main/VERIFICATION.md)
 
 ## 9. Simulation & Results 
+
+### 9.1. RTL Schematic
+
+#### Top View
+
+<div align = "center">
+
+![RTL Schematic](images/RTL_schematic.png)
+
+</div>
+
+#### Expanded View
+
+<div align = "center">
+
+![RTL Schematic Zoomed](images/RTL_zoomed.png)
+
+</div>
+
+### 9.2. Integrated SPI Controller Waveform
+
+<div align="center">
+
+![Waveform Full View](waveforms/waveform_summary.gif)
+
+</div>
+
+### 9.3. Verification Summary
+
+The complete verification suite was executed for all four SPI modes by varying the **CPOL** and **CPHA** parameters. All functional test cases passed successfully in each configuration.
+
+<table>
+  <tr>
+    <th>Mode 0<br>(CPOL = 0, CPHA = 0)</th>
+    <th>Mode 1<br>(CPOL = 0, CPHA = 1)</th>
+    <th>Mode 2<br>(CPOL = 1, CPHA = 0)</th>
+    <th>Mode 3<br>(CPOL = 1, CPHA = 1)</th>
+  </tr>
+  <tr>
+    <td><img src="images/mode0.png" width="220"></td>
+    <td><img src="images/mode1.png" width="220"></td>
+    <td><img src="images/mode2.png" width="220"></td>
+    <td><img src="images/mode3.png" width="220"></td>
+  </tr>
+</table>
+
 
 ## 10. Key Learnings
 - Gained practical experience in designing configurable RTL for synchronous serial communication protocols such as SPI.
 - Understood how Clock Polarity (CPOL) and Clock Phase (CPHA) affect data sampling and shifting in SPI communication. 
 - Strengthened RTL verification skills by debugging signal synchronization and testbench sequencing issues.
 
-## 10. Tools & Concepts Used
+## 11. Tools & Concepts Used
 
 **Language:** Verilog HDL
 
